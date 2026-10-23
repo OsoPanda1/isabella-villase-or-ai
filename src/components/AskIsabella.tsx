@@ -7,6 +7,8 @@ const suggestions = [
   "¿Cómo funciona el Triple Bloqueo CLEI?",
 ];
 
+const MAX_QUESTION_LENGTH = 600;
+
 export function AskIsabella() {
   const [q, setQ] = useState("");
   const [answer, setAnswer] = useState("");
@@ -15,42 +17,94 @@ export function AskIsabella() {
   const ctrl = useRef<AbortController | null>(null);
 
   async function ask(question: string) {
-    if (!question.trim() || loading) return;
-    ctrl.current = new AbortController();
+    const normalizedQuestion = question.trim();
+    if (!normalizedQuestion || loading) return;
+    if (normalizedQuestion.length > MAX_QUESTION_LENGTH) {
+      setError(`La pregunta no puede superar ${MAX_QUESTION_LENGTH} caracteres.`);
+      return;
+    }
+
+    const controller = new AbortController();
+    ctrl.current = controller;
     setLoading(true);
     setAnswer("");
     setError("");
+
     try {
       const res = await fetch("/api/public/ask", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question }),
-        signal: ctrl.current.signal,
+        headers: { "Content-Type": "application/json", Accept: "text/plain" },
+        body: JSON.stringify({ question: normalizedQuestion }),
+        signal: controller.signal,
       });
-      if (!res.ok || !res.body) {
-        setError(res.status === 429 ? "Demasiadas consultas, intenta en un momento." : res.status === 402 ? "Servicio de IA sin créditos disponibles." : (await res.text()) || "No se pudo responder.");
+
+      if (!res.ok) {
+        const details = (await res.text()).trim();
+        if (res.status === 429) {
+          setError("Se alcanzó el límite de consultas. Intenta de nuevo más tarde.");
+        } else if (res.status === 402) {
+          setError("El servicio de IA no está disponible por el momento.");
+        } else {
+          setError(details.slice(0, 500) || `No se pudo responder (HTTP ${res.status}).`);
+        }
         return;
       }
-      const reader = res.body.getReader();
-      const dec = new TextDecoder();
-      for (;;) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        setAnswer((a) => a + dec.decode(value, { stream: true }));
+
+      if (!res.body) {
+        setError("El servidor devolvió una respuesta vacía.");
+        return;
       }
-    } catch (e) {
-      if ((e as Error).name !== "AbortError") setError("Error de conexión.");
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let receivedContent = false;
+
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+          if (chunk) {
+            receivedContent = true;
+            setAnswer((previous) => previous + chunk);
+          }
+        }
+
+        const finalChunk = decoder.decode();
+        if (finalChunk) {
+          receivedContent = true;
+          setAnswer((previous) => previous + finalChunk);
+        }
+
+        if (!receivedContent && !controller.signal.aborted) {
+          setError("La respuesta llegó vacía. Intenta reformular la pregunta.");
+        }
+      } finally {
+        reader.releaseLock();
+      }
+    } catch (cause) {
+      if (cause instanceof Error && cause.name === "AbortError") {
+        return;
+      }
+      setError("No fue posible conectar con Isabella. Comprueba tu conexión e inténtalo de nuevo.");
     } finally {
-      setLoading(false);
+      if (ctrl.current === controller) {
+        ctrl.current = null;
+        setLoading(false);
+      }
     }
+  }
+
+  function stop() {
+    ctrl.current?.abort();
   }
 
   return (
     <div className="panel p-6 md:p-8">
       <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          ask(q);
+        onSubmit={(event) => {
+          event.preventDefault();
+          void ask(q);
         }}
         className="flex flex-col gap-3 sm:flex-row"
       >
@@ -58,34 +112,60 @@ export function AskIsabella() {
         <input
           id="ask-q"
           value={q}
-          onChange={(e) => setQ(e.target.value)}
-          maxLength={600}
+          onChange={(event) => setQ(event.target.value.slice(0, MAX_QUESTION_LENGTH))}
+          maxLength={MAX_QUESTION_LENGTH}
           placeholder="Pregunta sobre principios, agentes o certificación…"
           className="min-h-11 flex-1 border bg-background px-4 font-mono text-sm placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+          aria-describedby="ask-help"
+          disabled={loading}
         />
         {loading ? (
-          <button type="button" onClick={() => ctrl.current?.abort()} className="min-h-11 border border-accent px-6 font-mono text-xs uppercase tracking-widest text-accent">
+          <button
+            type="button"
+            onClick={stop}
+            className="min-h-11 border border-accent px-6 font-mono text-xs uppercase tracking-widest text-accent"
+          >
             Detener
           </button>
         ) : (
-          <button type="submit" className="min-h-11 bg-primary px-6 font-mono text-xs uppercase tracking-widest text-primary-foreground hover:bg-primary/90">
+          <button
+            type="submit"
+            disabled={!q.trim()}
+            className="min-h-11 bg-primary px-6 font-mono text-xs uppercase tracking-widest text-primary-foreground hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+          >
             Consultar
           </button>
         )}
       </form>
+      <p id="ask-help" className="mt-2 text-xs text-muted-foreground">
+        Máximo {MAX_QUESTION_LENGTH} caracteres. No incluyas contraseñas ni datos personales sensibles.
+      </p>
       <div className="mt-4 flex flex-wrap gap-2">
-        {suggestions.map((s) => (
-          <button key={s} type="button" onClick={() => { setQ(s); ask(s); }} className="min-h-9 border px-3 text-xs text-muted-foreground hover:border-primary hover:text-primary">
-            {s}
+        {suggestions.map((suggestion) => (
+          <button
+            key={suggestion}
+            type="button"
+            disabled={loading}
+            onClick={() => {
+              setQ(suggestion);
+              void ask(suggestion);
+            }}
+            className="min-h-9 border px-3 text-xs text-muted-foreground hover:border-primary hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {suggestion}
           </button>
         ))}
       </div>
-      <div aria-live="polite" className="mt-6 min-h-24 border-t pt-6">
-        {error && <p className="text-sm text-destructive">{error}</p>}
+      <div aria-live="polite" aria-busy={loading} className="mt-6 min-h-24 border-t pt-6">
+        {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
         {!error && !answer && (
-          <p className="font-mono text-xs text-muted-foreground">{loading ? "Isabella está analizando el documento canónico…" : "Las respuestas se basan exclusivamente en el documento oficial de la presentación."}</p>
+          <p className="font-mono text-xs text-muted-foreground">
+            {loading
+              ? "Isabella está procesando la consulta…"
+              : "Las respuestas dependen del servicio de consulta configurado en el servidor."}
+          </p>
         )}
-        {answer && <p className="whitespace-pre-wrap text-sm leading-relaxed">{answer}</p>}
+        {answer && <p className="whitespace-pre-wrap break-words text-sm leading-relaxed">{answer}</p>}
       </div>
     </div>
   );
