@@ -1,15 +1,22 @@
 const MAX_QUESTION_LENGTH = 600;
 const MAX_BODY_BYTES = 8_192;
 
+export const SUPPORTED_LANGUAGES = [
+  "es", "en", "pt", "fr", "de", "it", "zh-CN", "ja", "ko", "hi", "ar", "ru",
+] as const;
+
+export type SupportedLanguage = (typeof SUPPORTED_LANGUAGES)[number];
+
 type ValidationResult =
-  | { ok: true; question: string }
+  | { ok: true; question: string; language: SupportedLanguage }
   | { ok: false; message: string; status: number };
 
 export function validatePublicQuestion(
   contentType: string | null,
   rawBody: string,
 ): ValidationResult {
-  if (!(contentType ?? "").toLowerCase().includes("application/json")) {
+  const mediaType = (contentType ?? "").split(";", 1)[0]?.trim().toLowerCase();
+  if (mediaType !== "application/json") {
     return { ok: false, message: "Content-Type debe ser application/json.", status: 415 };
   }
 
@@ -45,6 +52,17 @@ export function validatePublicQuestion(
     };
   }
 
-  return { ok: true, question };
-}
+  const requestedLanguage: unknown = "language" in payload ? payload.language : "es";
+  if (
+    typeof requestedLanguage !== "string" ||
+    !SUPPORTED_LANGUAGES.some((language) => language === requestedLanguage)
+  ) {
+    return {
+      ok: false,
+      message: "El idioma seleccionado no está admitido.",
+      status: 400,
+    };
+  }
 
+  return { ok: true, question, language: requestedLanguage as SupportedLanguage };
+}
