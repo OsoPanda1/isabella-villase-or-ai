@@ -72,7 +72,17 @@ export function LanguageSelector() {
 
     const initialize = () => {
       const TranslateElement = window.google?.translate?.TranslateElement;
-      if (!TranslateElement || document.getElementById(WIDGET_ID)?.dataset.initialized) return;
+      if (!TranslateElement) return;
+
+      const widget = document.getElementById(WIDGET_ID);
+      if (widget?.dataset.initialized) {
+        setReady(true);
+        if (window.googleTranslateElementInit === initialize) {
+          delete window.googleTranslateElementInit;
+        }
+        return;
+      }
+
       new TranslateElement(
         {
           pageLanguage: "es",
@@ -83,9 +93,11 @@ export function LanguageSelector() {
         },
         WIDGET_ID,
       );
-      const widget = document.getElementById(WIDGET_ID);
       if (widget) widget.dataset.initialized = "true";
       setReady(true);
+      if (window.googleTranslateElementInit === initialize) {
+        delete window.googleTranslateElementInit;
+      }
     };
 
     window.googleTranslateElementInit = initialize;
