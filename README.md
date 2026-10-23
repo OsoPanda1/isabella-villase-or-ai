@@ -15,16 +15,16 @@ Landing pública en español para presentar la visión, los principios de gobern
 ```bash
 git clone https://github.com/OsoPanda1/isabella-villase-or-ai.git
 cd isabella-villase-or-ai
-npm install
-npm run dev
+bun install
+bun run dev
 ```
 
 ## Verificaciones
 
 ```bash
-npm run lint
-npm test
-npm run build
+bun run lint
+bun run test
+bun run build
 ```
 
 Si alguna verificación falla, registra el comando, el archivo y el error reproducible antes de declarar el proyecto listo para producción.
