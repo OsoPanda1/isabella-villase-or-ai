@@ -3,6 +3,7 @@ import { streamText } from "ai";
 import { createFileRoute } from "@tanstack/react-router";
 import doc from "@/content/isabella.md?raw";
 import { validatePublicQuestion } from "@/lib/public-ask-validation";
+import { enforcePublicAskRateLimit } from "@/lib/public-ask-rate-limit";
 
 const MAX_BODY_BYTES = 8_192;
 
@@ -83,6 +84,27 @@ export const Route = createFileRoute("/api/public/ask")({
 
         const validated = validatePublicQuestion(request.headers.get("content-type"), rawBody);
         if (!validated.ok) return jsonError(validated.message, validated.status);
+
+        const rateLimit = await enforcePublicAskRateLimit(request);
+        if (!rateLimit.allowed && "retryAfterSeconds" in rateLimit) {
+          return Response.json(
+            { error: "Se alcanzó el límite de consultas. Inténtalo más tarde." },
+            {
+              status: 429,
+              headers: {
+                "Cache-Control": "no-store",
+                "Retry-After": String(rateLimit.retryAfterSeconds),
+                "X-Content-Type-Options": "nosniff",
+              },
+            },
+          );
+        }
+        if (!rateLimit.allowed) {
+          return jsonError(
+            "La protección contra abuso no está configurada o no está disponible.",
+            503,
+          );
+        }
 
         const openAIKey = process.env.OPENAI_API_KEY;
         const lovableKey = process.env.LOVABLE_API_KEY;
