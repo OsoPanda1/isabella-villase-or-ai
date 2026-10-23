@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import hero from "@/assets/hero-sphere.jpg";
 import { AskIsabella } from "@/components/AskIsabella";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 const references: [string, [string, string, string][]][] = [
   ["Seguridad y criptografía", [
@@ -210,7 +211,7 @@ function SiteHeader() {
 
   return (
     <header className="fixed inset-x-0 top-0 z-40 border-b bg-background/90 backdrop-blur-md">
-      <div className="mx-auto grid h-14 max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 sm:px-6 md:px-10 xl:flex xl:justify-between">
+      <div className="mx-auto grid h-14 max-w-7xl grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-3 px-4 sm:px-6 md:px-10 xl:flex xl:justify-between">
         <a href="#top" className="truncate font-display text-sm font-bold tracking-wider">
           ISABELLA<span className="text-primary"> / </span>TERMINUS V6
         </a>
@@ -221,9 +222,10 @@ function SiteHeader() {
             </a>
           ))}
         </nav>
+        <LanguageSelector />
         <button
           type="button"
-          onClick={() => setOpen((o) => !o)}
+          onClick={() => setOpen((o) => !o)
           aria-expanded={open}
           aria-controls="mobile-nav"
           aria-label={open ? "Cerrar menú de secciones" : "Abrir menú de secciones"}
