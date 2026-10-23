@@ -118,7 +118,8 @@ export const Route = createFileRoute("/api/public/ask")({
 
         const model = process.env.ISABELLA_PUBLIC_MODEL ||
           (lovableKey ? "openai/gpt-4.1-mini" : "gpt-4.1-mini");
-        const system = `${SYSTEM}\n\nIDIOMA OBLIGATORIO DE RESPUESTA: ${validated.language}. Responde en ese idioma aunque la pregunta esté escrita en otro.`;
+        const system = `${SYSTEM}\n\nIDIOMA OBLIGATORIO DE RESPUESTA: ${validated.language}. ` +
+          "Responde en ese idioma aunque la pregunta esté escrita en otro.";
 
         try {
           const provider = lovableKey
@@ -141,7 +142,10 @@ export const Route = createFileRoute("/api/public/ask")({
             maxRetries: 0,
             temperature: 0.2,
             onError: ({ error }) => {
-              console.error("Isabella public ask stream failed", error instanceof Error ? error.name : "UnknownError");
+              console.error(
+                "Isabella public ask stream failed",
+                error instanceof Error ? error.name : "UnknownError",
+              );
             },
           });
 
@@ -152,7 +156,10 @@ export const Route = createFileRoute("/api/public/ask")({
             },
           });
         } catch (error) {
-          console.error("Isabella public ask failed to initialize", error instanceof Error ? error.name : "UnknownError");
+          console.error(
+            "Isabella public ask failed to initialize",
+            error instanceof Error ? error.name : "UnknownError",
+          );
           return jsonError("No fue posible iniciar la consulta en este momento.", 502);
         }
       },
