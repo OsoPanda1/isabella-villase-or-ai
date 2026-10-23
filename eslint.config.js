@@ -38,7 +38,7 @@ export default tseslint.config(
   },
 
   {
-    files: ["src/routes/api/**/*.ts", "src/server.ts", "*.config.ts"],
+    files: ["src/routes/api/**/*.ts", "src/server.ts", "src/lib/public-ask-rate-limit.ts", "*.config.ts"],
     languageOptions: { globals: globals.node },
   },
   eslintPluginPrettier,
