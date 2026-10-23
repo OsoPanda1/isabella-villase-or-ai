@@ -261,8 +261,17 @@ function Index() {
     <div className="relative overflow-x-hidden">
       <div className="scanline pointer-events-none fixed inset-x-0 top-0 z-50 h-40" />
       <SiteHeader />
-      <aside role="note" aria-label="Estado de implementación" className="mx-auto mt-14 max-w-7xl border-b border-primary/30 bg-background px-6 py-4 text-xs leading-relaxed text-muted-foreground md:px-10">
-        <strong className="text-primary">Estado de implementación:</strong> esta presentación combina una landing funcional con una arquitectura objetivo. En este repositorio, el endpoint público implementado es <code className="text-foreground">POST /api/public/ask</code>. Los demás endpoints, subsistemas, métricas y controles descritos son objetivos de diseño, no capacidades certificadas ni despliegues verificados.
+      <aside
+        role="note"
+        aria-label="Estado de implementación"
+        className="mx-auto mt-14 max-w-7xl border-b border-primary/30 bg-background px-6 py-4 text-xs leading-relaxed text-muted-foreground md:px-10"
+      >
+        <strong className="text-primary">Estado de implementación:</strong>{" "}
+        Esta presentación combina una landing funcional con una arquitectura objetivo. En este
+        repositorio, el endpoint público implementado es{" "}
+        <code className="text-foreground">POST /api/public/ask</code>. Los demás endpoints,
+        subsistemas, métricas y controles descritos son objetivos de diseño, no capacidades
+        certificadas ni despliegues verificados.
       </aside>
 
       {/* HERO */}
