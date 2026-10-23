@@ -1,54 +1,80 @@
-# Isabella Villaseñor AI
+# Isabella Villaseñor AI™
 
-Landing pública en español para presentar la visión, los principios de gobernanza y la arquitectura propuesta de Isabella Villaseñor AI. Aplicación construida con React, TanStack Start, Vite, Tailwind CSS y TypeScript.
+Landing pública para presentar la visión, los principios de gobernanza y la arquitectura propuesta de Isabella Villaseñor AI. La aplicación usa React 19, TanStack Start/Router, Vite 8, Tailwind CSS 4, TypeScript y el AI SDK.
 
-> **Estado técnico:** el repositorio está en desarrollo. La presencia de una descripción arquitectónica o de una interfaz no demuestra por sí sola que todos los sistemas descritos estén implementados, certificados o en producción. El estado real debe determinarse mediante build, pruebas, revisión de rutas y validación del despliegue.
+> **Estado de producción:** el repositorio incorpora controles automatizados y una ruta pública de consulta, pero no se considera listo para producción hasta que CI termine en verde, se validen las variables del proveedor y se realice una prueba HTTP en el entorno desplegado. La documentación arquitectónica no demuestra por sí sola que cada subsistema descrito esté implementado.
 
 ## Requisitos
 
-- Node.js compatible con Vite 8 (Node.js 20.19+ o 22.12+ recomendado).
-- npm.
-- Una clave de API de OpenAI para habilitar el endpoint de consulta pública.
+- Bun (versión actual estable; el lockfile del proyecto es `bun.lock`).
+- Runtime compatible con Vite 8 (Node.js 20.19+ o 22.12+ si se usa Node para herramientas auxiliares).
+- Una clave de API de OpenAI o una clave válida de Lovable AI Gateway para habilitar la consulta pública.
 
 ## Desarrollo local
 
 ```bash
 git clone https://github.com/OsoPanda1/isabella-villase-or-ai.git
 cd isabella-villase-or-ai
-bun install
+bun install --frozen-lockfile
+cp .env.example .env
+# Edita .env y configura una sola clave de proveedor.
 bun run dev
 ```
 
-## Verificaciones
+No pegues secretos en el código, issues, registros públicos ni variables con prefijo `VITE_`.
+
+## Verificaciones locales
 
 ```bash
+bun run typecheck
 bun run lint
 bun run test
 bun run build
 ```
 
-Si alguna verificación falla, registra el comando, el archivo y el error reproducible antes de declarar el proyecto listo para producción.
+El workflow `.github/workflows/ci.yml` ejecuta estos controles en cada push a `main` y en cada pull request. Un commit no equivale a una ejecución satisfactoria: consulta el resultado real de Actions antes de promover una versión.
 
 ## Consulta pública de Isabella
 
-La interfaz envía preguntas a `POST /api/public/ask`. El servidor valida el tipo de contenido, el JSON, el campo `question` y su longitud antes de iniciar una respuesta en streaming.
+La interfaz utiliza `POST /api/public/ask`, implementado en `src/routes/api/public/ask.ts`.
 
-Configura la variable **solo en el entorno del servidor**:
+Controles implementados en el endpoint:
+- Acepta únicamente solicitudes JSON.
+- Limita el tamaño del cuerpo a 8 KiB y la pregunta a 600 caracteres.
+- Rechaza JSON inválido, campos ausentes, tipos incorrectos y preguntas vacías.
+- No reintenta automáticamente solicitudes al proveedor.
+- Devuelve errores HTTP explícitos si falta configuración o no se puede iniciar la consulta.
+- Transmite texto en streaming, no almacena la respuesta en caché y evita exponer la clave al navegador.
+- Usa el documento de presentación como contexto e instruye al modelo a no presentar propuestas como capacidades probadas.
 
-- `OPENAI_API_KEY`: clave privada de OpenAI. Nunca uses el prefijo `VITE_` para este secreto.
-- `ISABELLA_PUBLIC_MODEL`: modelo permitido para el endpoint (opcional; valor predeterminado configurado en el código).
+Variables del servidor:
+- `OPENAI_API_KEY`: clave privada de OpenAI.
+- `LOVABLE_API_KEY`: clave privada de Lovable AI Gateway. Se usa si está definida; si ambas claves existen, el gateway de Lovable tiene prioridad.
+- `ISABELLA_PUBLIC_MODEL`: modelo opcional compatible con el proveedor configurado.
 
-Ejemplo para un entorno local: coloca las variables en un archivo `.env` ignorado por Git y no publiques su contenido. En Vercel, configúralas en las variables de entorno del proyecto y vuelve a desplegar.
+Consulta `.env.example` para el formato. Los archivos `.env` están excluidos de Git; configura los secretos directamente en el panel del proveedor de despliegue.
 
-El endpoint responde con un error HTTP 503 si falta `OPENAI_API_KEY`; no simula una respuesta ni expone la clave al navegador. La disponibilidad y el costo del proveedor dependen de la configuración externa.
+### Límites operativos que aún requieren configuración
 
-## Alcance y límites
-
-- La landing presenta conceptos, módulos y objetivos del proyecto; no constituye una certificación independiente.
-- Las cifras, protocolos y capacidades arquitectónicas deben contrastarse con código ejecutable y pruebas antes de presentarse como resultados validados.
-- No se debe almacenar información sensible del usuario en preguntas públicas.
-- No se debe publicar una clave de API, credenciales ni secretos en el repositorio.
+- No hay limitador de frecuencia distribuido por usuario/IP en el código. Antes de exponer el endpoint públicamente, configura rate limiting y protección contra abuso en el gateway/CDN o incorpora un almacén compartido.
+- Define límites de gasto y alertas en el proveedor del modelo.
+- Verifica que el modelo configurado esté habilitado para la cuenta y región utilizadas.
+- No envíes información confidencial o datos personales sensibles a la consulta pública.
+- Las pruebas unitarias cubren validación de entrada; no sustituyen pruebas de integración con el proveedor real.
 
 ## Despliegue
 
-El proyecto incluye configuración Vite/TanStack Start. Antes de promover una versión a producción, valida localmente lint, pruebas y build; configura los secretos en el proveedor de despliegue; verifica las rutas HTTP y prueba el flujo de consulta con una clave válida y con la clave ausente. Un commit por sí solo no demuestra que el despliegue haya finalizado correctamente.
+La configuración de Vite usa el paquete `@lovable.dev/vite-tanstack-config`, que declara un target Nitro/Cloudflare por defecto. El adaptador y las variables del entorno real deben coincidir con el proveedor elegido. **No se afirma compatibilidad desplegada con Vercel hasta configurar ese target y verificar un despliegue real.**
+
+Antes de promover a producción:
+
+1. Exige que TypeScript, lint, pruebas y build terminen sin errores.
+2. Configura una clave de proveedor y el modelo autorizado en el entorno del servidor.
+3. Comprueba que `POST /api/public/ask` responde 415 a un tipo de contenido incorrecto, 400 a JSON/pregunta inválidos y 503 cuando falta la clave.
+4. Ejecuta una consulta real en staging y verifica streaming, cancelación, errores del proveedor y límites de gasto.
+5. Configura rate limiting, alertas, logging sin secretos, dominio/TLS y monitoreo de disponibilidad.
+6. Verifica el despliegue y las rutas desde el entorno público después de cada promoción.
+
+## Alcance y precisión
+
+La landing presenta conceptos, módulos y objetivos del proyecto; no es una certificación independiente. Los claims técnicos, cifras de rendimiento, garantías criptográficas y capacidades de agentes deben sostenerse con código ejecutable, pruebas reproducibles y evidencia antes de presentarse como resultados validados.
