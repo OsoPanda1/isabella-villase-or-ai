@@ -34,6 +34,12 @@ bun run build
 
 El workflow `.github/workflows/ci.yml` ejecuta estos controles en cada push a `main` y en cada pull request. Un commit no equivale a una ejecución satisfactoria: consulta el resultado real de Actions antes de promover una versión.
 
+## Idiomas de la plataforma
+
+La cabecera global incluye un selector con español, inglés, portugués, francés, alemán, italiano, chino simplificado, japonés, coreano, hindi, árabe y ruso. La preferencia se guarda en el almacenamiento local del navegador y se actualiza el atributo `lang` del documento.
+
+La traducción integral del contenido se realiza mediante el widget externo de Google Translate; por ello necesita conexión y disponibilidad del servicio, y sus resultados son traducciones automáticas no revisadas editorialmente. La plataforma no envía claves propias al navegador para esta función. Si se requiere disponibilidad garantizada, control de calidad terminológica, privacidad contractual o traducciones certificadas, debe sustituirse por un proveedor de traducción con SLA y revisión lingüística.
+
 ## Consulta pública de Isabella
 
 La interfaz utiliza `POST /api/public/ask`, implementado en `src/routes/api/public/ask.ts`.
