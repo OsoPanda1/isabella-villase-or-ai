@@ -36,7 +36,7 @@ El workflow `.github/workflows/ci.yml` ejecuta estos controles en cada push a `m
 
 ## Idiomas de la plataforma
 
-La cabecera global incluye un selector con español, inglés, portugués, francés, alemán, italiano, chino simplificado, japonés, coreano, hindi, árabe y ruso. La preferencia se guarda en el almacenamiento local del navegador y se actualiza el atributo `lang` del documento.
+La cabecera global incluye un selector con español, inglés, portugués, francés, alemán, italiano, chino simplificado, japonés, coreano, hindi, árabe y ruso. La preferencia se guarda en el almacenamiento local del navegador, actualiza el atributo `lang` y aplica dirección de derecha a izquierda para árabe. La consulta de Isabella también recibe el idioma seleccionado y lo valida en el servidor.
 
 La traducción integral del contenido se realiza mediante el widget externo de Google Translate; por ello necesita conexión y disponibilidad del servicio, y sus resultados son traducciones automáticas no revisadas editorialmente. La plataforma no envía claves propias al navegador para esta función. Si se requiere disponibilidad garantizada, control de calidad terminológica, privacidad contractual o traducciones certificadas, debe sustituirse por un proveedor de traducción con SLA y revisión lingüística.
 
@@ -46,11 +46,12 @@ La interfaz utiliza `POST /api/public/ask`, implementado en `src/routes/api/publ
 
 Controles implementados en el endpoint:
 - Acepta únicamente solicitudes JSON.
-- Limita el tamaño del cuerpo a 8 KiB y la pregunta a 600 caracteres.
+- Lee el cuerpo de forma acotada y cancela la lectura al superar 8 KiB; limita la pregunta a 600 caracteres.
 - Rechaza JSON inválido, campos ausentes, tipos incorrectos y preguntas vacías.
 - No reintenta automáticamente solicitudes al proveedor.
 - Devuelve errores HTTP explícitos si falta configuración o no se puede iniciar la consulta.
 - Transmite texto en streaming, no almacena la respuesta en caché y evita exponer la clave al navegador.
+- Valida el idioma de respuesta contra la lista admitida; el selector envía la preferencia al endpoint para que Isabella responda en ese idioma.
 - Usa el documento de presentación como contexto e instruye al modelo a no presentar propuestas como capacidades probadas.
 
 Variables del servidor:
