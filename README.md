@@ -67,7 +67,7 @@ Consulta `.env.example` para el formato. Los archivos `.env` están excluidos de
 - Configura límites de gasto y alertas en el proveedor del modelo; el rate limit no sustituye esas protecciones.
 - Verifica que el modelo configurado esté habilitado para la cuenta y región utilizadas.
 - No envíes información confidencial o datos personales sensibles a la consulta pública.
-- Las pruebas unitarias cubren validación de entrada; no sustituyen pruebas de integración con el proveedor real.
+- Las pruebas unitarias cubren validación de entrada y el limitador distribuido simulado; no sustituyen pruebas de integración con Redis real ni con el proveedor del modelo.
 
 ## Despliegue
 
@@ -77,7 +77,7 @@ Antes de promover a producción:
 
 1. Exige que TypeScript, lint, pruebas y build terminen sin errores.
 2. Configura una clave de proveedor, el modelo autorizado y las credenciales `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` en el entorno del servidor.
-3. Comprueba que `POST /api/public/ask` responde 415 a un tipo de contenido incorrecto, 400 a JSON/pregunta inválidos y 503 cuando falta la clave.
+3. Con el limitador configurado, comprueba que `POST /api/public/ask` responde 415 a un tipo de contenido incorrecto, 400 a JSON/pregunta/idioma inválidos, 429 al superar el límite y 503 cuando falta la clave del proveedor.
 4. Ejecuta una consulta real en staging y verifica streaming, cancelación, errores del proveedor y límites de gasto.
 5. Configura rate limiting, alertas, logging sin secretos, dominio/TLS y monitoreo de disponibilidad.
 6. Verifica el despliegue y las rutas desde el entorno público después de cada promoción.
