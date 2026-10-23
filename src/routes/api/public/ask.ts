@@ -141,7 +141,7 @@ export const Route = createFileRoute("/api/public/ask")({
             maxRetries: 0,
             temperature: 0.2,
             onError: ({ error }) => {
-              console.error("Isabella public ask stream failed", error);
+              console.error("Isabella public ask stream failed", error instanceof Error ? error.name : "UnknownError");
             },
           });
 
@@ -152,7 +152,7 @@ export const Route = createFileRoute("/api/public/ask")({
             },
           });
         } catch (error) {
-          console.error("Isabella public ask failed to initialize", error);
+          console.error("Isabella public ask failed to initialize", error instanceof Error ? error.name : "UnknownError");
           return jsonError("No fue posible iniciar la consulta en este momento.", 502);
         }
       },
