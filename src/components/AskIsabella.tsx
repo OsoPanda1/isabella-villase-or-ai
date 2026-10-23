@@ -34,12 +34,29 @@ export function AskIsabella() {
       const res = await fetch("/api/public/ask", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "text/plain" },
-        body: JSON.stringify({ question: normalizedQuestion }),
+        body: JSON.stringify({
+          question: normalizedQuestion,
+          language: document.documentElement.lang || "es",
+        }),
         signal: controller.signal,
       });
 
       if (!res.ok) {
-        const details = (await res.text()).trim();
+        const rawDetails = (await res.text()).trim();
+        let details = rawDetails;
+        try {
+          const payload: unknown = JSON.parse(rawDetails);
+          if (
+            typeof payload === "object" &&
+            payload !== null &&
+            "error" in payload &&
+            typeof payload.error === "string"
+          ) {
+            details = payload.error;
+          }
+        } catch {
+          // Providers may return plain text instead of JSON errors.
+        }
         if (res.status === 429) {
           setError("Se alcanzó el límite de consultas. Intenta de nuevo más tarde.");
         } else if (res.status === 402) {
