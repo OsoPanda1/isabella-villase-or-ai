@@ -63,8 +63,8 @@ Consulta `.env.example` para el formato. Los archivos `.env` están excluidos de
 
 ### Límites operativos que aún requieren configuración
 
-- No hay limitador de frecuencia distribuido por usuario/IP en el código. Antes de exponer el endpoint públicamente, configura rate limiting y protección contra abuso en el gateway/CDN o incorpora un almacén compartido.
-- Define límites de gasto y alertas en el proveedor del modelo.
+- El endpoint aplica un límite distribuido de 10 solicitudes por ventana de 60 segundos por IP mediante un contador atómico de Upstash Redis REST. En producción, `UPSTASH_REDIS_REST_URL` y `UPSTASH_REDIS_REST_TOKEN` son obligatorios; si faltan o Redis no responde, la ruta falla de forma cerrada con HTTP 503. En desarrollo local, el limitador se omite si no hay credenciales.
+- Configura límites de gasto y alertas en el proveedor del modelo; el rate limit no sustituye esas protecciones.
 - Verifica que el modelo configurado esté habilitado para la cuenta y región utilizadas.
 - No envíes información confidencial o datos personales sensibles a la consulta pública.
 - Las pruebas unitarias cubren validación de entrada; no sustituyen pruebas de integración con el proveedor real.
@@ -76,7 +76,7 @@ La configuración de Vite usa el paquete `@lovable.dev/vite-tanstack-config`, qu
 Antes de promover a producción:
 
 1. Exige que TypeScript, lint, pruebas y build terminen sin errores.
-2. Configura una clave de proveedor y el modelo autorizado en el entorno del servidor.
+2. Configura una clave de proveedor, el modelo autorizado y las credenciales `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` en el entorno del servidor.
 3. Comprueba que `POST /api/public/ask` responde 415 a un tipo de contenido incorrecto, 400 a JSON/pregunta inválidos y 503 cuando falta la clave.
 4. Ejecuta una consulta real en staging y verifica streaming, cancelación, errores del proveedor y límites de gasto.
 5. Configura rate limiting, alertas, logging sin secretos, dominio/TLS y monitoreo de disponibilidad.
