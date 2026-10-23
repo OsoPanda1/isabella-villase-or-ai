@@ -2,9 +2,7 @@ import { createOpenAI } from "@ai-sdk/openai";
 import { streamText } from "ai";
 import { createFileRoute } from "@tanstack/react-router";
 import doc from "@/content/isabella.md?raw";
-
-const MAX_QUESTION_LENGTH = 600;
-const MAX_BODY_BYTES = 8_192;
+import { validatePublicQuestion } from "@/lib/public-ask-validation";
 
 const SYSTEM = `Eres el asistente informativo de la presentación pública de Isabella Villaseñor AI™.
 Responde en el idioma del visitante, con tono profesional, preciso y conciso (aproximadamente 180 palabras).
@@ -13,53 +11,6 @@ Distingue entre capacidades implementadas, propuestas arquitectónicas y objetiv
 
 === DOCUMENTO DE REFERENCIA ===
 ${doc}`;
-
-type ValidationResult =
-  | { ok: true; question: string }
-  | { ok: false; message: string; status: number };
-
-export function validatePublicQuestion(
-  contentType: string | null,
-  rawBody: string,
-): ValidationResult {
-  if (!(contentType ?? "").toLowerCase().includes("application/json")) {
-    return { ok: false, message: "Content-Type debe ser application/json.", status: 415 };
-  }
-
-  if (new TextEncoder().encode(rawBody).byteLength > MAX_BODY_BYTES) {
-    return { ok: false, message: "La solicitud supera el tamaño permitido.", status: 413 };
-  }
-
-  let payload: unknown;
-  try {
-    payload = JSON.parse(rawBody) as unknown;
-  } catch {
-    return { ok: false, message: "El cuerpo JSON no es válido.", status: 400 };
-  }
-
-  if (
-    typeof payload !== "object" ||
-    payload === null ||
-    !("question" in payload) ||
-    typeof payload.question !== "string"
-  ) {
-    return { ok: false, message: "Envía una propiedad question de tipo texto.", status: 400 };
-  }
-
-  const question = payload.question.trim();
-  if (!question) {
-    return { ok: false, message: "La pregunta no puede estar vacía.", status: 400 };
-  }
-  if (question.length > MAX_QUESTION_LENGTH) {
-    return {
-      ok: false,
-      message: `La pregunta supera el máximo de ${MAX_QUESTION_LENGTH} caracteres.`,
-      status: 413,
-    };
-  }
-
-  return { ok: true, question };
-}
 
 function jsonError(message: string, status: number): Response {
   return Response.json({ error: message }, {
