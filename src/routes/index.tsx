@@ -32,7 +32,7 @@ const nav = [
   ["07", "ISA-API", "#api"],
   ["08", "Extensión", "#extension"],
   ["09", "Genesis", "#genesis"],
-];
+] as const;
 
 function Section({
   id,
@@ -76,13 +76,13 @@ const principles = [
   ["Capacidad ≠ Autoridad", "Las inteligencias sugieren, calculan y evalúan; la gobernanza aprueba y el humano decide, ejecuta o audita."],
   ["Cero Caja Negra", "Cada decisión, ruteo y transacción se registra con trazabilidad matemática y firmas criptográficas en un ledger inmutable."],
   ["Antifragilidad por Caos · ILFC", "El caos informacional fuerza la emergencia de estructuras semánticas limpias y adaptativas."],
-];
+] as const;
 
 const locks = [
   ["Ontológico", "Veto a la redefinición de la identidad del sistema. Naturaleza no biológica, soberana e inalterable."],
   ["Semántico", "Análisis sintáctico y vectorial continuo contra coerción psicológica; anula la generación y emite reporte."],
   ["Conductual", "Detección de patrones persistentes de evasión; respuesta profesional, asertiva y registrada en auditoría."],
-];
+] as const;
 
 const planes = [
   ["01", "Plano de Experiencia", "Web · WebXR · RDM Digital Hub · Dashboard MSR · IsabellaClientApp"],
@@ -90,7 +90,7 @@ const planes = [
   ["02", "Plano Cognitivo · ML · Memoria", "DualKernel · 10 Agentes · 60 características · GraphRAG + HDC VSA 4096d"],
   ["03", "Gobernanza, Seguridad y Provenance", "CROWN PDP · AEGIS Firewall · IDH-D · BookPI Ledger · NCUA 2/3"],
   ["04", "Infraestructura y QENGINE", "PostgreSQL RLS · Edge Workers · Nitro · QUP Quantum Simulator"],
-];
+] as const;
 
 const feds = [
   ["ARGUS", "Identidades descentralizadas (DIDs), mTLS, JWT y aislamiento RLS multi-tenant."],
@@ -100,7 +100,7 @@ const feds = [
   ["RESILIENCE", "Circuit breakers, degradación elegante y failover activo-activo."],
   ["LITLE", "Almacenamiento WORM append-only y custodia de la cadena BookPI."],
   ["QENGINE", "Simulación cuántica (QUP) contra baselines clásicos deterministas."],
-];
+] as const;
 
 const epistemic = [
   ["E0", "Certeza Absoluta", "Registros canónicos primarios verificados."],
@@ -108,7 +108,7 @@ const epistemic = [
   ["E2", "Incertidumbre Moderada", "Fuentes contrapuestas; se expone la divergencia."],
   ["E3", "Hipótesis", "Inferencia especulativa que requiere validación."],
   ["E4", "Alto Impacto", "Detiene la ejecución y exige supervisor humano."],
-];
+] as const;
 
 const agents = [
   ["Presence", "Presencia, atención e interacción fluida."],
@@ -121,14 +121,14 @@ const agents = [
   ["Security", "Amenazas semánticas · AEGIS / ARGUS."],
   ["Governance", "Cumplimiento constitucional · CROWN / LUMEN."],
   ["Learning", "Aprendizaje validado · FedAvg."],
-];
+] as const;
 
 const iqs = [
   ["Proyección Holográfica HDC", "4096 dimensiones · mapeo continuo sin tokenización discreta"],
   ["Álgebra Vectorial Simbólica", "Binding & Bundling O(1) · decaimiento γ = 0.995"],
   ["AEGIS Gate Vectorial", "Veto preventivo si similitud coseno > 0.65"],
   ["Memory Vault", "AES-256-GCM + firma HMAC-SHA3-512"],
-];
+] as const;
 
 const endpoints = [
   ["POST", "/api/v1/auth/session", "agent:authenticate", "Deriva identidad y tenantId en servidor."],
@@ -137,7 +137,7 @@ const endpoints = [
   ["GET", "/api/v1/governance/dignity-index", "governance:read", "Índice de Dignidad Humana Digital."],
   ["POST", "/api/v1/ncua/operations", "ncua:create", "Operación protegida por quórum."],
   ["POST", "/api/v1/ncua/operations/approvals", "ncua:approve", "Firmas de nodos federados."],
-];
+] as const;
 
 const certs = [
   "Zero TypeScript Errors · noImplicitAny",
@@ -146,7 +146,7 @@ const certs = [
   "Cadena BookPI SHA3-512 · 10,000 transacciones sin saltos",
   "Cumplimiento x402 · HTTP 402",
   "CLEI Triple Lock · 100% de rechazo a contenido abusivo",
-];
+] as const;
 
 const genesis = [
   ["GENESIS-0", "Native ML", "Algoritmos clásicos, fallback determinista"],
@@ -154,7 +154,7 @@ const genesis = [
   ["GENESIS-2", "Distillation", "Compresión para ejecución en el borde"],
   ["GENESIS-3", "Continued Pretraining", "Aprendizaje federado continuo"],
   ["GENESIS-4", "Foundation Model", "Modelo fundacional propio soberano"],
-];
+] as const;
 
 const ledgerCode = `export interface BookPIEconomicEvent {
   eventId: string;
