@@ -166,13 +166,13 @@ const endpoints = [
   ["POST", "/api/v1/ncua/operations/approvals", "ncua:approve", "Firmas de nodos federados."],
 ] as const;
 
-const certs = [
-  "Zero TypeScript Errors · noImplicitAny",
-  "100% pass rate · unitarias, integración, adversariales, federadas",
-  "CROWN Guard en todos los endpoints monetizados",
-  "Cadena BookPI SHA3-512 · 10,000 transacciones sin saltos",
-  "Cumplimiento x402 · HTTP 402",
-  "CLEI Triple Lock · 100% de rechazo a contenido abusivo",
+const releaseCriteria = [
+  "TypeScript sin errores, verificado por CI en el commit de liberación",
+  "Pruebas unitarias, de integración y adversariales ejecutadas con resultados publicados",
+  "CROWN Guard desplegado y probado en cada endpoint monetizado",
+  "Prueba reproducible de 10,000 transacciones BookPI sin saltos de cadena",
+  "Flujo x402 / HTTP 402 probado de extremo a extremo",
+  "Evaluación documentada de CLEI frente a contenido abusivo",
 ] as const;
 
 const genesis = [
@@ -261,6 +261,9 @@ function Index() {
     <div className="relative overflow-x-hidden">
       <div className="scanline pointer-events-none fixed inset-x-0 top-0 z-50 h-40" />
       <SiteHeader />
+      <aside role="note" aria-label="Estado de implementación" className="mx-auto mt-14 max-w-7xl border-b border-primary/30 bg-background px-6 py-4 text-xs leading-relaxed text-muted-foreground md:px-10">
+        <strong className="text-primary">Estado de implementación:</strong> esta presentación combina una landing funcional con una arquitectura objetivo. En este repositorio, el endpoint público implementado es <code className="text-foreground">POST /api/public/ask</code>. Los demás endpoints, subsistemas, métricas y controles descritos son objetivos de diseño, no capacidades certificadas ni despliegues verificados.
+      </aside>
 
       {/* HERO */}
       <section id="top" className="relative min-h-screen pt-14">
@@ -384,7 +387,7 @@ function Index() {
         </div>
       </Section>
 
-      <Section id="ismf" n="06" kicker="Sovereign Monetization Fabric" title="Economía de agentes ética, automatizada e inmutable.">
+      <Section id="ismf" n="06" kicker="Diseño económico propuesto" title="Modelo de monetización con reglas de gobernanza y trazabilidad.">
         <div className="grid gap-4 lg:grid-cols-3">
           <Card tag="CROWN · TENANTGUARD" title="Candado por suscripción activa">
             Sin <code className="text-primary">subscriptionStatus == "ACTIVE"</code> el motor emite 403
@@ -412,7 +415,7 @@ function Index() {
         </div>
       </Section>
 
-      <Section id="api" n="07" kicker="ISA-API v3.0 · OpenAPI 3.1.0" title="Autoridad ejecutable Zero-Trust y criptografía post-cuántica.">
+      <Section id="api" n="07" kicker="Contrato de API propuesto · pendiente de implementación" title="Interfaces objetivo para autorización, gobernanza y criptografía.">
         <div className="panel mb-10 overflow-x-auto">
           <table className="w-full min-w-[720px] text-left font-mono text-xs">
             <thead className="border-b text-accent">
@@ -465,11 +468,11 @@ function Index() {
             </div>
           ))}
         </div>
-        <p className="eyebrow mb-6">Criterios Code Freeze · CERTIFIED</p>
+        <p className="eyebrow mb-6">Criterios de Code Freeze · pendientes de evidencia</p>
         <ul className="grid gap-3 md:grid-cols-2">
-          {certs.map((c) => (
+          {releaseCriteria.map((c) => (
             <li key={c} className="panel flex items-center gap-4 p-4 text-sm">
-              <span className="font-mono text-primary">[x]</span>{c}
+              <span className="font-mono text-accent">[ ]</span>{c}
             </li>
           ))}
         </ul>
