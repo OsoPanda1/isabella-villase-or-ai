@@ -15,7 +15,7 @@ Landing pública en español para presentar la visión, los principios de gobern
 ```bash
 git clone https://github.com/OsoPanda1/isabella-villase-or-ai.git
 cd isabella-villase-or-ai
-npm ci
+npm install
 npm run dev
 ```
 
