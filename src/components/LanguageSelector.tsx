@@ -100,11 +100,9 @@ export function LanguageSelector() {
       document.head.appendChild(script);
     }
 
-    return () => {
-      if (window.googleTranslateElementInit === initialize) {
-        delete window.googleTranslateElementInit;
-      }
-    };
+    // Keep the callback registered while the async Google script loads.
+    // Removing it during React StrictMode's development remount can leave
+    // the widget permanently uninitialized.
   }, []);
 
   useEffect(() => {
