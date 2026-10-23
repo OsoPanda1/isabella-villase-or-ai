@@ -38,7 +38,11 @@ async function readBoundedBody(request: Request, maxBytes: number): Promise<stri
       if (done) break;
       bytesRead += value.byteLength;
       if (bytesRead > maxBytes) {
-        await reader.cancel("Request body exceeds configured limit");
+        try {
+          await reader.cancel("Request body exceeds configured limit");
+        } catch {
+          // Preserve the size-limit response even if stream cancellation fails.
+        }
         throw new RangeError("REQUEST_BODY_TOO_LARGE");
       }
       body += decoder.decode(value, { stream: true });
