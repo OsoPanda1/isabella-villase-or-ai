@@ -64,6 +64,7 @@ export function LanguageSelector() {
       if (saved && LANGUAGES.some((item) => item.code === saved)) {
         setLanguage(saved as LanguageCode);
         document.documentElement.lang = saved;
+        document.documentElement.dir = saved === "ar" ? "rtl" : "ltr";
       }
     } catch {
       // Language selection still works for the current session when storage is unavailable.
@@ -123,6 +124,7 @@ export function LanguageSelector() {
     const selected = next as LanguageCode;
     setLanguage(selected);
     document.documentElement.lang = selected;
+    document.documentElement.dir = selected === "ar" ? "rtl" : "ltr";
     setMessage("");
     try {
       window.localStorage.setItem(STORAGE_KEY, selected);
