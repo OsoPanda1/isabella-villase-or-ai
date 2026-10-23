@@ -416,6 +416,34 @@ function Index() {
         </div>
       </section>
 
+      <Section id="consulta" n="10" kicker="Consulta Interactiva · IA" title="Pregunta a Isabella sobre principios, agentes y certificación.">
+        <AskIsabella />
+      </Section>
+
+      <Section id="referencias" n="11" kicker="Referencias Académicas y Normativas" title="Fuentes que respaldan seguridad, certificación e impacto global.">
+        <div className="grid gap-10 lg:grid-cols-3">
+          {references.map(([group, items]) => (
+            <div key={group}>
+              <p className="eyebrow mb-4">{group}</p>
+              <ol className="space-y-3">
+                {items.map(([t, s, u]) => (
+                  <li key={u} className="panel p-4">
+                    <a href={u} target="_blank" rel="noopener noreferrer" className="text-sm font-medium hover:text-primary focus-visible:text-primary focus-visible:outline-none">
+                      {t} <span aria-hidden="true" className="text-primary">↗</span>
+                    </a>
+                    <p className="mt-1 font-mono text-[11px] text-muted-foreground">{s}</p>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ))}
+        </div>
+        <p className="mt-8 max-w-3xl text-xs text-muted-foreground">
+          Las referencias documentan los estándares y fundamentos científicos sobre los que se construye la arquitectura;
+          no constituyen una certificación de terceros del sistema.
+        </p>
+      </Section>
+
       <footer className="border-t">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 px-6 py-8 font-mono text-xs text-muted-foreground md:flex-row md:justify-between md:px-10">
           <span>© Isabella Villaseñor AI™ · Edwin Oswaldo Castillo Trejo · ORCID 0009-0008-5050-1539</span>
