@@ -25,7 +25,10 @@ describe("validatePublicQuestion", () => {
   });
 
   it("rejects malformed JSON", () => {
-    expect(validatePublicQuestion("application/json", "{")).toMatchObject({ ok: false, status: 400 });
+    expect(validatePublicQuestion("application/json", "{")).toMatchObject({
+      ok: false,
+      status: 400,
+    });
   });
 
   it("rejects missing or non-string questions", () => {
