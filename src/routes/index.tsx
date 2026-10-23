@@ -225,7 +225,7 @@ function SiteHeader() {
         <LanguageSelector />
         <button
           type="button"
-          onClick={() => setOpen((o) => !o)
+          onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
           aria-controls="mobile-nav"
           aria-label={open ? "Cerrar menú de secciones" : "Abrir menú de secciones"}
