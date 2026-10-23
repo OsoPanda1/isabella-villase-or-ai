@@ -1,5 +1,31 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import hero from "@/assets/hero-sphere.jpg";
+import { AskIsabella } from "@/components/AskIsabella";
+
+const references: [string, [string, string, string][]][] = [
+  ["Seguridad y criptografía", [
+    ["NIST FIPS 203 — ML-KEM", "NIST, 2024", "https://csrc.nist.gov/pubs/fips/203/final"],
+    ["NIST FIPS 204 — ML-DSA", "NIST, 2024", "https://csrc.nist.gov/pubs/fips/204/final"],
+    ["NIST FIPS 205 — SLH-DSA", "NIST, 2024", "https://csrc.nist.gov/pubs/fips/205/final"],
+    ["NIST SP 800-207 — Zero Trust Architecture", "Rose et al., NIST, 2020", "https://csrc.nist.gov/pubs/sp/800/207/final"],
+    ["FIPS 202 — SHA-3 Standard", "NIST, 2015", "https://csrc.nist.gov/pubs/fips/202/final"],
+  ]],
+  ["Certificación, gobernanza y ML", [
+    ["AI Risk Management Framework (AI RMF 1.0)", "NIST AI 100-1, 2023", "https://www.nist.gov/itl/ai-risk-management-framework"],
+    ["ISO/IEC 42001 — AI Management Systems", "ISO/IEC, 2023", "https://www.iso.org/standard/81230.html"],
+    ["Communication-Efficient Learning (FedAvg)", "McMahan et al., AISTATS 2017", "https://arxiv.org/abs/1602.05629"],
+    ["A Unified Approach to Interpreting Model Predictions (SHAP)", "Lundberg & Lee, NeurIPS 2017", "https://arxiv.org/abs/1705.07874"],
+    ["Hyperdimensional Computing", "Kanerva, Cognitive Computation, 2009", "https://doi.org/10.1007/s12559-009-9009-8"],
+  ]],
+  ["Ética e impacto global", [
+    ["Recomendación sobre la Ética de la IA", "UNESCO, 2021", "https://www.unesco.org/es/artificial-intelligence/recommendation-ethics"],
+    ["Principios de IA de la OCDE", "OCDE, 2019/2024", "https://oecd.ai/en/ai-principles"],
+    ["Governing AI for Humanity — Final Report", "ONU, 2024", "https://www.un.org/en/ai-advisory-body"],
+    ["EU Artificial Intelligence Act", "Reglamento (UE) 2024/1689", "https://eur-lex.europa.eu/eli/reg/2024/1689/oj"],
+    ["Índice Latinoamericano de IA (ILIA)", "CENIA, 2024", "https://indicelatam.cl/"],
+  ]],
+];
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -169,26 +195,70 @@ const ledgerCode = `export interface BookPIEconomicEvent {
   policyVersion: string;
 }`;
 
+function SiteHeader() {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  return (
+    <header className="fixed inset-x-0 top-0 z-40 border-b bg-background/90 backdrop-blur-md">
+      <div className="mx-auto grid h-14 max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-4 px-4 sm:px-6 md:px-10 xl:flex xl:justify-between">
+        <a href="#top" className="truncate font-display text-sm font-bold tracking-wider">
+          ISABELLA<span className="text-primary"> / </span>TERMINUS V6
+        </a>
+        <nav aria-label="Secciones" className="hidden gap-4 xl:flex">
+          {nav.map(([n, l, h]) => (
+            <a key={h} href={h} className="font-mono text-xs text-muted-foreground transition-colors hover:text-primary focus-visible:text-primary focus-visible:outline-none">
+              <span className="text-primary/60">{n}</span> {l}
+            </a>
+          ))}
+        </nav>
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+          aria-controls="mobile-nav"
+          aria-label={open ? "Cerrar menú de secciones" : "Abrir menú de secciones"}
+          className="flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-2 border px-3 font-mono text-xs uppercase tracking-widest text-primary focus-visible:outline-2 focus-visible:outline-primary xl:hidden"
+        >
+          <span aria-hidden="true" className="relative block h-3 w-4">
+            <span className={`absolute left-0 h-px w-4 bg-primary transition-transform ${open ? "top-1.5 rotate-45" : "top-0"}`} />
+            <span className={`absolute left-0 top-1.5 h-px w-4 bg-primary transition-opacity ${open ? "opacity-0" : ""}`} />
+            <span className={`absolute left-0 h-px w-4 bg-primary transition-transform ${open ? "top-1.5 -rotate-45" : "top-3"}`} />
+          </span>
+          Menú
+        </button>
+      </div>
+      {open && (
+        <nav id="mobile-nav" aria-label="Secciones" className="max-h-[calc(100dvh-3.5rem)] overflow-y-auto border-t bg-background xl:hidden">
+          <ul className="mx-auto grid max-w-7xl grid-cols-1 gap-px bg-border sm:grid-cols-2">
+            {nav.map(([n, l, h]) => (
+              <li key={h} className="bg-background">
+                <a href={h} onClick={() => setOpen(false)} className="flex min-h-12 items-center gap-4 px-6 font-display text-base hover:bg-primary/5 hover:text-primary focus-visible:bg-primary/5 focus-visible:outline-none">
+                  <span className="font-mono text-xs text-primary">{n}</span>{l}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )}
+    </header>
+  );
+}
+
 function Index() {
   return (
     <div className="relative overflow-x-hidden">
       <div className="scanline pointer-events-none fixed inset-x-0 top-0 z-50 h-40" />
-
-      <header className="fixed inset-x-0 top-0 z-40 border-b bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between px-6 md:px-10">
-          <a href="#top" className="font-display text-sm font-bold tracking-wider">
-            ISABELLA<span className="text-primary"> / </span>TERMINUS V6
-          </a>
-          <nav className="hidden gap-5 lg:flex">
-            {nav.map(([n, l, h]) => (
-              <a key={h} href={h} className="font-mono text-xs text-muted-foreground transition-colors hover:text-primary">
-                <span className="text-primary/50">{n}</span> {l}
-              </a>
-            ))}
-          </nav>
-          <span className="font-mono text-xs text-accent">v3.0-MASTER</span>
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* HERO */}
       <section id="top" className="relative min-h-screen pt-14">
@@ -415,6 +485,34 @@ function Index() {
           </p>
         </div>
       </section>
+
+      <Section id="consulta" n="10" kicker="Consulta Interactiva · IA" title="Pregunta a Isabella sobre principios, agentes y certificación.">
+        <AskIsabella />
+      </Section>
+
+      <Section id="referencias" n="11" kicker="Referencias Académicas y Normativas" title="Fuentes que respaldan seguridad, certificación e impacto global.">
+        <div className="grid gap-10 lg:grid-cols-3">
+          {references.map(([group, items]) => (
+            <div key={group}>
+              <p className="eyebrow mb-4">{group}</p>
+              <ol className="space-y-3">
+                {items.map(([t, s, u]) => (
+                  <li key={u} className="panel p-4">
+                    <a href={u} target="_blank" rel="noopener noreferrer" className="text-sm font-medium hover:text-primary focus-visible:text-primary focus-visible:outline-none">
+                      {t} <span aria-hidden="true" className="text-primary">↗</span>
+                    </a>
+                    <p className="mt-1 font-mono text-[11px] text-muted-foreground">{s}</p>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ))}
+        </div>
+        <p className="mt-8 max-w-3xl text-xs text-muted-foreground">
+          Las referencias documentan los estándares y fundamentos científicos sobre los que se construye la arquitectura;
+          no constituyen una certificación de terceros del sistema.
+        </p>
+      </Section>
 
       <footer className="border-t">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 px-6 py-8 font-mono text-xs text-muted-foreground md:flex-row md:justify-between md:px-10">
