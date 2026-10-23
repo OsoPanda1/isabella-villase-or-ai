@@ -22,9 +22,16 @@ function getTrustedClientIp(request: Request): string | null {
   return proxyIp || null;
 }
 
-async function hashIp(ip: string): Promise<string> {
-  const bytes = new TextEncoder().encode(ip);
-  const digest = await crypto.subtle.digest("SHA-256", bytes);
+async function hashIp(ip: string, secret: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const digest = await crypto.subtle.sign("HMAC", key, encoder.encode(ip));
   return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
@@ -47,7 +54,7 @@ export async function enforcePublicAskRateLimit(request: Request): Promise<RateL
   if (!ip) return { allowed: false, unavailable: true };
 
   try {
-    const ipHash = await hashIp(ip);
+    const ipHash = await hashIp(ip, token);
     const response = await fetch(baseUrl, {
       method: "POST",
       headers: {
