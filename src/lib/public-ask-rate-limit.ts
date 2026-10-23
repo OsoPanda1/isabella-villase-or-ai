@@ -38,9 +38,9 @@ export async function enforcePublicAskRateLimit(request: Request): Promise<RateL
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
 
   if (!baseUrl || !token) {
-    return process.env.NODE_ENV === "production"
-      ? { allowed: false, unavailable: true }
-      : { allowed: true, remaining: MAX_REQUESTS };
+    return process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test"
+      ? { allowed: true, remaining: MAX_REQUESTS }
+      : { allowed: false, unavailable: true };
   }
 
   const ip = getTrustedClientIp(request);
