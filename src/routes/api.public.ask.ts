@@ -24,9 +24,19 @@ export const Route = createFileRoute("/api/public/ask")({
           return jsonError("La solicitud supera el tamaño permitido.", 413);
         }
 
+        let rawBody: string;
+        try {
+          rawBody = await request.text();
+        } catch {
+          return jsonError("No se pudo leer el cuerpo de la solicitud.", 400);
+        }
+        if (new TextEncoder().encode(rawBody).byteLength > MAX_BODY_BYTES) {
+          return jsonError("La solicitud supera el tamaño permitido.", 413);
+        }
+
         let payload: unknown;
         try {
-          payload = await request.json();
+          payload = JSON.parse(rawBody) as unknown;
         } catch {
           return jsonError("El cuerpo JSON no es válido.", 400);
         }
