@@ -41,11 +41,11 @@ async function hashIp(ip: string, secret: string): Promise<string> {
  * Local development can run without Redis to keep setup straightforward.
  */
 export async function enforcePublicAskRateLimit(request: Request): Promise<RateLimitResult> {
-  const baseUrl = process.env.UPSTASH_REDIS_REST_URL?.replace(/\/+$/, "");
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const baseUrl = process.env["UPSTASH_REDIS_REST_URL"]?.replace(/\/+$/, "");
+  const token = process.env["UPSTASH_REDIS_REST_TOKEN"];
 
   if (!baseUrl || !token) {
-    return process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test"
+    return process.env["NODE_ENV"] === "development" || process.env["NODE_ENV"] === "test"
       ? { allowed: true, remaining: MAX_REQUESTS }
       : { allowed: false, unavailable: true };
   }

@@ -110,13 +110,13 @@ export const Route = createFileRoute("/api/public/ask")({
           );
         }
 
-        const openAIKey = process.env.OPENAI_API_KEY;
-        const lovableKey = process.env.LOVABLE_API_KEY;
+        const openAIKey = process.env["OPENAI_API_KEY"];
+        const lovableKey = process.env["LOVABLE_API_KEY"];
         if (!openAIKey && !lovableKey) {
           return jsonError("El servicio de consulta no está configurado en el servidor.", 503);
         }
 
-        const model = process.env.ISABELLA_PUBLIC_MODEL ||
+        const model = process.env["ISABELLA_PUBLIC_MODEL"] ||
           (lovableKey ? "openai/gpt-4.1-mini" : "gpt-4.1-mini");
         const system = `${SYSTEM}\n\nIDIOMA OBLIGATORIO DE RESPUESTA: ${validated.language}. ` +
           "Responde en ese idioma aunque la pregunta esté escrita en otro.";

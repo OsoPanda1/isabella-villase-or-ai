@@ -28,6 +28,25 @@ const references: [string, [string, string, string][]][] = [
   ]],
 ];
 
+const verifiedPlatforms: [string, string][] = [
+  ["OpenAlex", "https://openalex.org"],
+  ["Crossref", "https://www.crossref.org"],
+  ["DataCite", "https://datacite.org"],
+  ["OpenAIRE", "https://www.openaire.eu"],
+  ["PubMed", "https://pubmed.ncbi.nlm.nih.gov"],
+  ["Figshare", "https://figshare.com"],
+  ["OSF — Open Science Framework", "https://osf.io"],
+];
+
+const unifiedPlatforms = [
+  "World Economic Forum (WEF)",
+  "ResearchGate",
+  "Frontiers",
+  "Neon",
+  "OpenAI",
+  "Google Developers",
+];
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -521,6 +540,50 @@ function Index() {
               </ol>
             </div>
           ))}
+        </div>
+        <div className="mt-10 border-t pt-10">
+          <p className="eyebrow mb-4">Plataformas y registros consultados</p>
+          <div className="grid gap-8 lg:grid-cols-2">
+            <div className="panel p-5">
+              <p className="mb-3 font-mono text-[11px] uppercase tracking-widest text-primary">
+                Verificadas en la última consulta
+              </p>
+              <ul className="flex flex-wrap gap-2">
+                {verifiedPlatforms.map(([name, url]) => (
+                  <li key={url}>
+                    <a
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex min-h-9 items-center gap-1 border px-3 text-xs text-muted-foreground hover:border-primary hover:text-primary focus-visible:border-primary focus-visible:outline-none"
+                    >
+                      {name} <span aria-hidden="true" className="text-primary">↗</span>
+                    </a>
+                  </li>
+                ))}
+                <li className="inline-flex min-h-9 items-center gap-1 border border-dashed px-3 text-xs text-muted-foreground">
+                  Zenodo
+                  <span className="font-mono text-[10px] uppercase tracking-wider">· no disponible en la última consulta</span>
+                </li>
+              </ul>
+            </div>
+            <div className="panel p-5">
+              <p className="mb-3 font-mono text-[11px] uppercase tracking-widest text-primary">
+                Unificadas en la web oficial
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {unifiedPlatforms.join(" · ")} se integran y documentan en la red oficial de TAMV Online Network.
+              </p>
+              <a
+                href="https://tamv.online"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex min-h-11 items-center gap-2 bg-primary px-5 font-mono text-xs uppercase tracking-widest text-primary-foreground hover:bg-primary/90 focus-visible:outline-none"
+              >
+                tamv.online — Web Oficial <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </div>
         </div>
         <p className="mt-8 max-w-3xl text-xs text-muted-foreground">
           Las referencias documentan los estándares y fundamentos científicos sobre los que se construye la arquitectura;

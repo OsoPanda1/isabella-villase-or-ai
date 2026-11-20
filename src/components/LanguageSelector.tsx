@@ -75,7 +75,7 @@ export function LanguageSelector() {
       if (!TranslateElement) return;
 
       const widget = document.getElementById(WIDGET_ID);
-      if (widget?.dataset.initialized) {
+      if (widget?.dataset["initialized"]) {
         setReady(true);
         if (window.googleTranslateElementInit === initialize) {
           delete window.googleTranslateElementInit;
@@ -93,7 +93,7 @@ export function LanguageSelector() {
         },
         WIDGET_ID,
       );
-      if (widget) widget.dataset.initialized = "true";
+      if (widget) widget.dataset["initialized"] = "true";
       setReady(true);
       if (window.googleTranslateElementInit === initialize) {
         delete window.googleTranslateElementInit;
